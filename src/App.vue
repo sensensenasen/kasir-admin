@@ -12,7 +12,7 @@
     name: 'App',
     metaInfo: {
       title: 'Kasir Admin',
-      titleTemplate: '%s | Dashboard',
+      titleTemplate: '%s',
       htmlAttrs: { lang: 'en' },
       meta: [
         { charset: 'utf-8' },
