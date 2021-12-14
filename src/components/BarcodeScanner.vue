@@ -5,6 +5,7 @@
     >
       <image-barcode-reader
         @decode="onDecode"
+        @error="onError"
       />
     </v-col>
   </v-row>
@@ -28,6 +29,9 @@
     methods: {
       onDecode (result) {
         this.$emit('result', result)
+      },
+      onError (error) {
+        this.$emit('error', error)
       },
     },
   }
