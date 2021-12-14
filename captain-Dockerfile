@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:lts-alpine as build-stage
 
 # install simple http server for serving static content
 # RUN npm install -g http-server
@@ -23,6 +23,6 @@ RUN yarn run build
 # CMD [ "http-server", "dist" ]
 
 FROM nginx:stable-alpine as production-stage
-COPY --from=build-stage dist /usr/share/nginx/html
+COPY --from=build-stage /dist /usr/share/nginx/html
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]
