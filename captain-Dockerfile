@@ -1,7 +1,7 @@
 FROM node:lts-alpine
 
 # install simple http server for serving static content
-RUN npm install -g http-server
+# RUN npm install -g http-server
 
 # make the 'app' folder the current working directory
 WORKDIR /
@@ -19,5 +19,10 @@ COPY . .
 # build app for production with minification
 RUN yarn run build
 
+# EXPOSE 8080
+# CMD [ "http-server", "dist" ]
+
+FROM nginx:stable-alpine as production-stage
+COPY --from=build-stage dist /usr/share/nginx/html
 EXPOSE 8080
-CMD [ "http-server", "dist" ]
+CMD ["nginx", "-g", "daemon off;"]
