@@ -172,6 +172,11 @@
               {{ userData.phone }}
             </span>
             <h4 class="text-h4 mt-3 mb-3 text--primary">
+              <span>
+                <v-icon
+                  small
+                >{{ genderIcon }}</v-icon>
+              </span>
               {{ userData.fullName }}
             </h4>
 
@@ -189,14 +194,26 @@
               {{ userData.bio }}
             </p>
 
-            <v-btn
-              class="mr-0"
-              color="primary"
-              min-width="100"
-              @click="onEditProfile"
-            >
-              Edit Data
-            </v-btn>
+            <v-row justify="center">
+              <v-btn
+                class="mr-0"
+                color="primary"
+                min-width="100"
+                @click="onEditProfile"
+              >
+                Edit Data
+              </v-btn>
+            </v-row>
+            <v-row justify="center">
+              <v-btn
+                class="mr-0"
+                color="danger"
+                text
+                @click="onLogout"
+              >
+                Logout
+              </v-btn>
+            </v-row>
           </v-card-text>
         </app-card>
       </v-col>
@@ -335,6 +352,17 @@
                   sm="12"
                   md="12"
                 >
+                  <v-select
+                    v-model="editUserData.gender"
+                    :items="genderDs"
+                    label="Jenis Kelamin"
+                  />
+                </v-col>
+                <v-col
+                  cols="12"
+                  sm="12"
+                  md="12"
+                >
                   <v-textarea
                     v-model="editUserData.bio"
                     label="Bio"
@@ -402,6 +430,10 @@
       ],
       fileUploadImage: undefined,
       loading: false,
+      genderDs: [
+        'laki-laki',
+        'perempuan',
+      ],
     }),
     computed: {
       avatarURL: function () {
@@ -411,6 +443,13 @@
         }
         return url
       },
+      genderIcon: function () {
+        if (this.userData.gender === 'laki-laki') {
+          return 'mdi-gender-male'
+        } else {
+          return 'mdi-gender-female'
+        }
+      },
     },
     created () {
       this.initialize()
@@ -419,12 +458,18 @@
       initialize () {
         var self = this
         self.token = localStorage.getItem('token')
-        axios
-          .get(process.env.VUE_APP_API_URL + 'users/token/' + self.token)
-          .then((response) => {
-            self.userData = response.data
-          })
-          .catch((error) => console.log(error))
+        var user = JSON.parse(localStorage.getItem('userData'))
+        if (user === null) {
+          axios
+            .get(process.env.VUE_APP_API_URL + 'users/token/' + self.token)
+            .then((response) => {
+              self.userData = response.data
+              localStorage.setItem('userData', JSON.stringify(self.userData))
+            })
+            .catch((error) => console.log(error))
+        } else {
+          self.userData = user
+        }
       },
       onShowQR () {
         this.dialogQR = true
@@ -443,12 +488,13 @@
           email: self.editUserData.email,
           phone: self.editUserData.phone,
           bio: self.editUserData.bio,
+          gender: self.editUserData.gender,
           id: self.editUserData.id,
         }
 
         axios.put(process.env.VUE_APP_API_URL + 'users/id/' + self.editUserData.id, putObj)
           .then((response) => {
-            console.log(response.data)
+            localStorage.setItem('userData', JSON.stringify(response.data))
             self.$toast.success('Sukses update profile', {
               type: 'success',
               position: 'top-right',
@@ -477,7 +523,7 @@
 
         axios.post(process.env.VUE_APP_API_URL + 'users/uploads', formData)
           .then((response) => {
-            console.log(response.data)
+            localStorage.setItem('userData', JSON.stringify(response.data))
             self.$toast.success('Sukses upload profile image', {
               type: 'success',
               position: 'top-right',
@@ -498,6 +544,13 @@
               dismissible: true,
             })
           })
+      },
+      onLogout () {
+        // localStorage.removeItem('isAuth')
+        // localStorage.removeItem('token')
+        // localStorage.removeItem('userRole')
+        localStorage.clear()
+        this.$router.push({ path: '/auth/login' })
       },
     },
   }

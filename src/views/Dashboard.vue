@@ -5,185 +5,150 @@
     tag="section"
   >
     <v-row>
+      <label
+        class="font-weight-bold mx-3"
+        v-text="'Transaction List'"
+      />
       <v-col cols="12">
-        <v-row>
-          <v-col
-            v-for="(chart, i) in charts"
-            :key="`chart-${i}`"
-            cols="12"
-            md="6"
-            lg="4"
-          >
-            <material-chart-card
-              :color="chart.color"
-              :data="chart.data"
-              :options="chart.options"
-              :responsive-options="chart.responsiveOptions"
-              :title="chart.title"
-              :type="chart.type"
+        <v-data-iterator
+          :items="transactionList"
+          :items-per-page.sync="itemsPerPage"
+          :page.sync="page"
+          :search="search"
+          :sort-by="sortBy"
+          :sort-desc="sortDesc"
+          hide-default-footer
+        >
+          <!-- Header -->
+          <template v-slot:header>
+            <v-toolbar
+              dark
+              color="primary"
+              class="mb-1"
             >
-              <template #subtitle>
-                <div class="font-weight-light text--secondary">
-                  <div v-html="chart.subtitle" />
-                </div>
-              </template>
-
-              <template #actions>
-                <v-icon
-                  class="mr-1"
-                  small
-                >
-                  mdi-clock-outline
-                </v-icon>
-
-                <span
-                  class="text-caption grey--text font-weight-light"
-                  v-text="chart.time"
+              <v-text-field
+                v-model="search"
+                clearable
+                flat
+                solo-inverted
+                hide-details
+                prepend-inner-icon="mdi-magnify"
+                :label="'Search ' + sortBy"
+              />
+              <template v-if="$vuetify.breakpoint.mdAndUp">
+                <v-spacer />
+                <v-select
+                  v-model="sortBy"
+                  flat
+                  solo-inverted
+                  hide-details
+                  :items="keys"
+                  prepend-inner-icon="mdi-magnify"
+                  label="Sort by"
                 />
-              </template>
-            </material-chart-card>
-          </v-col>
-        </v-row>
-      </v-col>
-
-      <v-col
-        v-for="({ actionIcon, actionText, ...attrs }, i) in stats"
-        :key="i"
-        cols="12"
-        md="6"
-        lg="3"
-      >
-        <material-stat-card v-bind="attrs">
-          <template #actions>
-            <v-icon
-              class="mr-2"
-              small
-              v-text="actionIcon"
-            />
-            <div class="text-truncate">
-              {{ actionText }}
-            </div>
-          </template>
-        </material-stat-card>
-      </v-col>
-
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <material-card
-          color="orange"
-          full-header
-        >
-          <template #heading>
-            <div class="pa-8 white--text">
-              <div class="text-h4 font-weight-light">
-                Employees Stats
-              </div>
-              <div class="text-caption">
-                New employees on 15th September, 2016
-              </div>
-            </div>
-          </template>
-          <v-card-text>
-            <v-data-table
-              :headers="headers"
-              :items="items"
-            />
-          </v-card-text>
-        </material-card>
-      </v-col>
-
-      <v-col
-        cols="12"
-        md="6"
-      >
-        <material-card
-          color="accent"
-          full-header
-        >
-          <template #heading>
-            <v-tabs
-              v-model="tabs"
-              background-color="transparent"
-              slider-color="white"
-              class="pa-8"
-            >
-              <span
-                class="subheading font-weight-light mx-3"
-                style="align-self: center"
-              >Tasks:</span>
-              <v-tab class="mr-3">
-                <v-icon class="mr-2">
-                  mdi-bug
-                </v-icon>
-                Bugs
-              </v-tab>
-              <v-tab class="mr-3">
-                <v-icon class="mr-2">
-                  mdi-code-tags
-                </v-icon>
-                Website
-              </v-tab>
-              <v-tab>
-                <v-icon class="mr-2">
-                  mdi-cloud
-                </v-icon>
-                Server
-              </v-tab>
-            </v-tabs>
-          </template>
-          <v-tabs-items
-            v-model="tabs"
-            background-color="transparent"
-          >
-            <v-tab-item
-              v-for="n in 3"
-              :key="n"
-            >
-              <v-card-text>
-                <template v-for="(task, i) in tasks[tabs]">
-                  <v-row
-                    :key="i"
-                    align="center"
-                    class="flex-nowrap"
+                <v-spacer />
+                <v-btn-toggle
+                  v-model="sortDesc"
+                  mandatory
+                >
+                  <v-btn
+                    large
+                    depressed
+                    color="primary"
+                    :value="false"
                   >
-                    <v-col cols="1">
-                      <v-list-item-action>
-                        <v-simple-checkbox
-                          v-model="task.value"
-                          color="secondary"
-                        />
-                      </v-list-item-action>
-                    </v-col>
+                    <v-icon>mdi-arrow-up</v-icon>
+                  </v-btn>
+                  <v-btn
+                    large
+                    depressed
+                    color="primary"
+                    :value="true"
+                  >
+                    <v-icon>mdi-arrow-down</v-icon>
+                  </v-btn>
+                </v-btn-toggle>
+              </template>
+            </v-toolbar>
+          </template>
 
-                    <v-col
-                      class="font-weight-light"
-                      cols="8"
-                      v-text="task.text"
-                    />
+          <!-- Body Data -->
+          <template v-slot:default="props">
+            <v-row dense>
+              <div
+                v-for="(item, i) in props.items"
+                :key="i"
+                class="col-sm-12 col-md-6 col-lg-4"
+              >
+                <card-transaction :source="item" />
+              </div>
+            </v-row>
+          </template>
 
-                    <v-col
-                      cols="auto"
-                      class="text-right"
-                    >
-                      <v-icon class="mx-1">
-                        mdi-pencil
-                      </v-icon>
-
-                      <v-icon
-                        class="mx-1"
-                        color="error"
-                      >
-                        mdi-close
-                      </v-icon>
-                    </v-col>
-                  </v-row>
+          <!-- Footer -->
+          <template v-slot:footer>
+            <v-row
+              class="mt-2 mx-0"
+              align="center"
+              justify="center"
+            >
+              <small class="grey--text">Items per page</small>
+              <v-menu offset-y>
+                <template v-slot:activator="{ on, attrs }">
+                  <v-btn
+                    dark
+                    text
+                    x-small
+                    color="primary"
+                    class="ml-2"
+                    v-bind="attrs"
+                    v-on="on"
+                  >
+                    {{ itemsPerPage }}
+                    <v-icon>mdi-chevron-down</v-icon>
+                  </v-btn>
                 </template>
-              </v-card-text>
-            </v-tab-item>
-          </v-tabs-items>
-        </material-card>
+                <v-list>
+                  <v-list-item
+                    v-for="(number, index) in itemsPerPageArray"
+                    :key="index"
+                    @click="updateItemsPerPage(number)"
+                  >
+                    <v-list-item-title>{{ number }}</v-list-item-title>
+                  </v-list-item>
+                </v-list>
+              </v-menu>
+
+              <v-spacer />
+
+              <small
+                class="mr-4 grey--text"
+              >
+                Page {{ page }} of {{ numberOfPages }}
+              </small>
+              <v-btn
+                fab
+                dark
+                x-small
+                color="primary"
+                class="mr-1"
+                @click="formerPage"
+              >
+                <v-icon>mdi-chevron-left</v-icon>
+              </v-btn>
+              <v-btn
+                fab
+                dark
+                x-small
+                color="primary"
+                class="ml-1"
+                @click="nextPage"
+              >
+                <v-icon>mdi-chevron-right</v-icon>
+              </v-btn>
+            </v-row>
+          </template>
+        </v-data-iterator>
       </v-col>
     </v-row>
   </v-container>
@@ -193,6 +158,8 @@
   // Utilities
   import { get } from 'vuex-pathify'
   import Vue from 'vue'
+  import axios from 'axios'
+  import CardTransaction from '../components/CardTransaction.vue'
 
   const lineSmooth = Vue.chartist.Interpolation.cardinal({
     tension: 0,
@@ -200,7 +167,9 @@
 
   export default {
     name: 'DashboardView',
-
+    components: {
+      'card-transaction': CardTransaction,
+    },
     data: () => ({
       charts: [{
         type: 'Bar',
@@ -430,12 +399,68 @@
           },
         ],
       },
+      transactionList: null,
+      page: 1,
+      itemsPerPage: 4,
+      itemsPerPageArray: [4, 8, 12],
+      search: '',
+      filter: {},
+      sortDesc: false,
+      sortBy: 'orderCode',
+      keys: [
+        'orderCode',
+        'orderDate',
+        'transactionAmount',
+        'status',
+      ],
     }),
 
     computed: {
       sales: get('sales/sales'),
       totalSales () {
         return this.sales.reduce((acc, val) => acc + val.salesInM, 0)
+      },
+      numberOfPages () {
+        return Math.ceil(this.items.length / this.itemsPerPage)
+      },
+      filteredKeys () {
+        return this.keys.filter(key => key !== 'orderCode')
+      },
+    },
+    created () {
+      this.initialize()
+    },
+    methods: {
+      initialize () {
+        var self = this
+        self.transactionList = []
+        axios
+          .get(process.env.VUE_APP_API_URL + 'orders/all/')
+          .then((response) => {
+            response.data.forEach(element => {
+              axios
+                .get(process.env.VUE_APP_API_URL + 'orders/id/' + element.id)
+                .then((response) => {
+                  self.transactionList.push(response.data)
+                  localStorage.setItem('transactionList', JSON.stringify(self.transactionList))
+                })
+                .catch((error) => {
+                  console.log(error)
+                })
+            })
+          })
+          .catch((error) => {
+            console.log(error)
+          })
+      },
+      nextPage () {
+        if (this.page + 1 <= this.numberOfPages) this.page += 1
+      },
+      formerPage () {
+        if (this.page - 1 >= 1) this.page -= 1
+      },
+      updateItemsPerPage (number) {
+        this.itemsPerPage = number
       },
     },
   }

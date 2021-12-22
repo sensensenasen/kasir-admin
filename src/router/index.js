@@ -1,7 +1,7 @@
 // Imports
 import Vue from 'vue'
 import Router from 'vue-router'
-import { trailingSlash } from '@/util/helpers'
+// import { trailingSlash } from '@/util/helpers'
 import {
   layout,
   route,
@@ -10,7 +10,7 @@ import {
 Vue.use(Router)
 
 const router = new Router({
-  mode: 'history',
+  // mode: 'history',
   base: process.env.BASE_URL,
   scrollBehavior: (to, from, savedPosition) => {
     if (to.hash) return { selector: to.hash }
@@ -39,17 +39,33 @@ const router = new Router({
     ]),
     layout('Auth', [
       route('Login', null, 'auth/login'),
+      route('Register', null, 'auth/register'),
     ]),
     layout('Home', [
       route('Home', null, 'home'),
       route('User Profile', null, 'profile'),
       route('Keranjang', null, 'keranjang'),
     ]),
+    layout('Checkout', [
+      route('CheckoutSuccess', null, 'checkout/success'),
+    ]),
   ],
 })
 
 router.beforeEach((to, from, next) => {
-  return to.path.endsWith('/') ? next() : next(trailingSlash(to.path))
+  // return to.path.endsWith('/') ? next() : next(trailingSlash(to.path))
+  const isAuth = localStorage.getItem('isAuth')
+
+  if (to.path !== '/auth/login' && !isAuth) {
+    if (to.path === '/auth/register') {
+      return next()
+    } else {
+      return next({ path: '/auth/login' })
+    }
+  } else if (to.path === '/auth/login' && isAuth) {
+    return next()
+  }
+  next()
 })
 
 export default router

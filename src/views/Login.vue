@@ -10,10 +10,9 @@
         class="mx-auto d-flex px-8 py-4"
         max-width="500"
       >
-        <v-row justify="center">
+        <v-row>
           <v-col
             cols="12"
-            md="8"
           >
             <h2 class="mb-2">
               Login
@@ -25,7 +24,7 @@
             >
               <v-text-field
                 v-model="name"
-                label="Name/Email"
+                label="User Name/Email"
                 :rules="nameRules"
                 required
               />
@@ -41,15 +40,23 @@
                 @keyup.enter="login"
               />
               <v-row
-                class="d-flex justify-center"
+                class="d-flex justify-center mt-3"
               >
                 <v-btn
                   :disabled="!valid"
                   color="primary"
-                  class="mr-4"
                   @click="login"
                 >
                   Login
+                </v-btn>
+              </v-row>
+              <v-row class="d-flex justify-center">
+                <v-btn
+                  text
+                  color="gray"
+                  @click="goToRegister"
+                >
+                  Register Account
                 </v-btn>
               </v-row>
             </v-form>
@@ -71,7 +78,7 @@
       ],
       password: '',
       passwordRules: [
-        v => !!v || 'E-mail is required',
+        v => !!v || 'Password is required',
       ],
       showPass: false,
     }),
@@ -120,6 +127,9 @@
       },
       reset () {
         this.$refs.form.reset()
+      },
+      goToRegister () {
+        this.$router.push({ path: '/auth/register' })
       },
     },
   }

@@ -50,9 +50,10 @@
 
     methods: {
       onLogout () {
-        localStorage.removeItem('isAuth')
-        localStorage.removeItem('token')
-        localStorage.removeItem('userRole')
+        // localStorage.removeItem('isAuth')
+        // localStorage.removeItem('token')
+        // localStorage.removeItem('userRole')
+        localStorage.clear()
         this.$router.push({ path: '/auth/login' })
       },
     },

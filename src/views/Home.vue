@@ -8,7 +8,7 @@
     <v-row
       align="center"
     >
-      <v-col
+      <!-- <v-col
         cols="2"
       >
         <v-avatar
@@ -19,16 +19,25 @@
             :src="avatarURL"
           >
         </v-avatar>
-      </v-col>
+      </v-col> -->
       <v-col
-        cols="8"
-        class="ml-2"
+        cols="10"
+        class="d-flex flex-row align-center"
       >
-        {{ welcomeTag }}
-        <br>
-        <small>
-          {{ userData.fullName }}
-        </small>
+        <v-img
+          class="rounded-circle elevation-4 d-inline-block"
+          :src="avatarURL"
+          width="54"
+          height="54"
+          max-width="54"
+        />
+        <div class="ml-4">
+          {{ welcomeTag }}
+          <br>
+          <small>
+            {{ userData.fullName }}
+          </small>
+        </div>
       </v-col>
       <v-col
         cols="1"
@@ -203,13 +212,18 @@
       initialize () {
         var self = this
         self.token = localStorage.getItem('token')
-        axios
-          .get(process.env.VUE_APP_API_URL + 'users/token/' + self.token)
-          .then((response) => {
-            self.userData = response.data
-            console.log(self.userData)
-          })
-          .catch((error) => console.log(error))
+        var user = JSON.parse(localStorage.getItem('userData'))
+        if (user === null) {
+          axios
+            .get(process.env.VUE_APP_API_URL + 'users/token/' + self.token)
+            .then((response) => {
+              self.userData = response.data
+              localStorage.setItem('userData', JSON.stringify(self.userData))
+            })
+            .catch((error) => console.log(error))
+        } else {
+          self.userData = user
+        }
       },
       login () {
         var self = this
