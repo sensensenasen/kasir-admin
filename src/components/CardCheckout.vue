@@ -40,7 +40,7 @@
       />
       <label
         class="font-weight-black black--text mr-2"
-        v-text="'Rp ' + source.transactionAmount"
+        v-text="saldoFormat"
       />
     </v-card-text>
   </v-card>
@@ -56,6 +56,15 @@
       orderDateFormat: function () {
         var date = new Date(this.source.orderDate)
         return moment(date).format('dddd, DD/MM/YYYY [at] HH:mm')
+      },
+      saldoFormat: function () {
+        if (this.source.transactionAmount !== null) {
+          return 'Rp ' + this.source.transactionAmount.toFixed(0).replace(/./g, function (c, i, a) {
+            return i > 0 && c !== '.' && (a.length - i) % 3 === 0 ? ',' + c : c
+          })
+        } else {
+          return 'Rp 0'
+        }
       },
     },
   }

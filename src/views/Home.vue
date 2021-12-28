@@ -55,10 +55,10 @@
         </v-badge>
       </v-col>
     </v-row>
-    <v-row class="mt-4">
+    <v-row class="mt-4 justify-center">
       <v-card
-        class="mx-auto"
-        max-width="344"
+        class="mx-3"
+        width="300"
         outlined
       >
         <v-list-item three-line>
@@ -67,7 +67,7 @@
               SALDO
             </div>
             <v-list-item-title class="text-h2 mb-1">
-              Rp 1.500.000
+              {{ saldoFormat }}
             </v-list-item-title>
           </v-list-item-content>
         </v-list-item>
@@ -77,6 +77,7 @@
             class="d-flex align-center"
             color="primary"
             outlined
+            @click="dialogTopup = true"
           >
             Top Up
           </v-btn>
@@ -160,12 +161,23 @@
         </v-card-actions>
       </v-card>
     </v-row>
+    <!-- Dialog Topup -->
+    <v-dialog
+      v-model="dialogTopup"
+      width="400"
+    >
+      <card-topup @callback="topupCb" />
+    </v-dialog>
   </v-container>
 </template>
 <script>
   import axios from 'axios'
+  import CardTopup from '../components/CardTopup.vue'
   export default {
     name: 'HomeView',
+    components: {
+      'card-topup': CardTopup,
+    },
     data: () => ({
       valid: true,
       loading: false,
@@ -183,6 +195,7 @@
         saldo: 0,
       },
       token: '',
+      dialogTopup: false,
     }),
     computed: {
       welcomeTag: function () {
@@ -204,6 +217,15 @@
         }
         return url
       },
+      saldoFormat: function () {
+        if (this.userData.saldo !== null) {
+          return 'Rp ' + this.userData.saldo.toFixed(0).replace(/./g, function (c, i, a) {
+            return i > 0 && c !== '.' && (a.length - i) % 3 === 0 ? ',' + c : c
+          })
+        } else {
+          return 'Rp 0'
+        }
+      },
     },
     created () {
       this.initialize()
@@ -212,18 +234,13 @@
       initialize () {
         var self = this
         self.token = localStorage.getItem('token')
-        var user = JSON.parse(localStorage.getItem('userData'))
-        if (user === null) {
-          axios
-            .get(process.env.VUE_APP_API_URL + 'users/token/' + self.token)
-            .then((response) => {
-              self.userData = response.data
-              localStorage.setItem('userData', JSON.stringify(self.userData))
-            })
-            .catch((error) => console.log(error))
-        } else {
-          self.userData = user
-        }
+        axios
+          .get(process.env.VUE_APP_API_URL + 'users/token/' + self.token)
+          .then((response) => {
+            self.userData = response.data
+            localStorage.setItem('userData', JSON.stringify(self.userData))
+          })
+          .catch((error) => console.log(error))
       },
       login () {
         var self = this
@@ -269,6 +286,14 @@
       },
       reset () {
         this.$refs.form.reset()
+      },
+      topupCb (cb) {
+        if (cb.cancel) {
+          this.dialogTopup = false
+        } else if (cb.submit) {
+          this.dialogTopup = false
+          this.initialize()
+        }
       },
     },
   }

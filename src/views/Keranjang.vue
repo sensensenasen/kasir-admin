@@ -132,7 +132,7 @@
       <v-divider />
       <label
         class="font-weight-bold text-right py-2"
-        v-text="'Total: Rp ' + orderObj.transactionAmount"
+        v-text="trAmountFormat"
       />
       <v-btn
         color="primary"
@@ -416,6 +416,11 @@
       },
       apiURL: function () {
         return process.env.VUE_APP_API_URL
+      },
+      trAmountFormat: function () {
+        return 'Total: Rp ' + this.orderObj.transactionAmount.toFixed(0).replace(/./g, function (c, i, a) {
+          return i > 0 && c !== '.' && (a.length - i) % 3 === 0 ? ',' + c : c
+        })
       },
     },
     created () {
