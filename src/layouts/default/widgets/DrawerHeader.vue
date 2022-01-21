@@ -9,9 +9,9 @@
 
     <v-list-item-content class="pl-2">
       <v-list-item-title class="text-h3">
-        <strong class="mr-1 font-weight-black">eMart</strong>
+        <strong class="mr-1 font-weight-black">Warung</strong>
 
-        <span class="primary--text">Kasir</span>
+        <span class="primary--text">Pintar</span>
       </v-list-item-title>
     </v-list-item-content>
   </v-list-item>
