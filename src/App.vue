@@ -11,7 +11,7 @@
   export default {
     name: 'App',
     metaInfo: {
-      title: 'Kasir Admin',
+      title: 'Warung Pintar',
       titleTemplate: '%s',
       htmlAttrs: { lang: 'en' },
       meta: [
