@@ -206,8 +206,19 @@
             </v-row>
             <v-row justify="center">
               <v-btn
-                class="mr-0"
+                class="mr-0 mt-2"
+                color="grey"
+                min-width="100"
+                @click="onShowQR"
+              >
+                Show My QR
+              </v-btn>
+            </v-row>
+            <v-row justify="center">
+              <v-btn
+                class="mr-0 mt-2"
                 color="danger"
+                small
                 text
                 @click="onLogout"
               >
